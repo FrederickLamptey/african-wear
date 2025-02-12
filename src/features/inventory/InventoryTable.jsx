@@ -1,4 +1,8 @@
-import styled from "styled-components";
+import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
+import { getInventory } from '../../services/apiInventory';
+import Spinner from '../../ui/Spinner';
+import InventoryRow from './InventoryRow';
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -23,3 +27,34 @@ const TableHeader = styled.header`
   color: var(--color-grey-600);
   padding: 1.6rem 2.4rem;
 `;
+
+function InventoryTable() {
+  const {
+    isLoading,
+    data: inventory,
+    error,
+  } = useQuery({
+    queryKey: ['inventory'],
+    queryFn: getInventory,
+  });
+
+  if (isLoading) return <Spinner />;
+
+  return (
+    <Table role="table">
+      <TableHeader role="row">
+        <div></div>
+        <div>Item</div>
+        <div>Department</div>
+        <div>Price</div>
+        <div>Discount</div>
+        <div></div>
+      </TableHeader>
+      {inventory.map((item) => (
+        <InventoryRow inventory={item} key={item.id} />
+      ))}
+    </Table>
+  );
+}
+
+export default InventoryTable;
