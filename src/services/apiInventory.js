@@ -11,6 +11,19 @@ export async function getInventory() {
   return data;
 }
 
+export async function createInventory(newInventory) {
+  const { data, error } = await supabase
+    .from('inventory')
+    .insert([newInventory]);
+
+  if (error) {
+    console.error(error);
+    throw new Error('Inventory could not be created!');
+  }
+
+  return data;
+}
+
 export async function deleteInventory(id) {
   const { data, error } = await supabase
     .from('inventory')
