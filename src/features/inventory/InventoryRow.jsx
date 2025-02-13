@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../utils/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteInventory } from '../../services/apiInventory';
+import toast from 'react-hot-toast';
 
 const TableRow = styled.div`
   display: grid;
@@ -45,27 +46,38 @@ const Discount = styled.div`
 `;
 
 function InventoryRow({ inventory }) {
-  const { id: inventoryId, name, department, regularPrice, discount, image } = inventory;
+  const {
+    id: inventoryId,
+    name,
+    department,
+    regularPrice,
+    discount,
+    image,
+  } = inventory;
   const queryClient = useQueryClient();
-  
+
   const { isLoading: isDeleting, mutate } = useMutation({
     mutationFn: deleteInventory,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['inventory']
-      })
+        queryKey: ['inventory'],
+      });
+      toast.success('Item successfully deleted!');
     },
-  })
+    onError: (err) => toast.error(err.message),
+  });
   return (
-    <TableRow role='row'>
+    <TableRow role="row">
       <Img src={image} />
       <Item>{name}</Item>
       <div>{department}</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
-      <button onClick={() => mutate(inventoryId)} disabled={isDeleting}>Delete</button>
+      <button onClick={() => mutate(inventoryId)} disabled={isDeleting}>
+        Delete
+      </button>
     </TableRow>
-  )
+  );
 }
 
-export default InventoryRow
+export default InventoryRow;
