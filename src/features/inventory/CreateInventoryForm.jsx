@@ -47,62 +47,121 @@ const Error = styled.span`
 `;
 
 function CreateInventoryForm() {
-   const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, getValues, formState } = useForm();
+
+  //get errors from the formState
+  const { errors } = formState;
+  console.log(errors)
+
+  //call react query client
   const queryClient = useQueryClient();
 
+  //create inventory in the database
   const { mutate, isLoading: isCreating } = useMutation({
     mutationFn: createInventory,
     onSuccess: () => {
-      toast.success("New inventory successfully created");
+      toast.success('New inventory successfully created');
       queryClient.invalidateQueries({
-        queryKey: ["inventory"]
+        queryKey: ['inventory'],
       });
       reset();
     },
     onError: (err) => toast.error(err.message),
-  })
+  });
 
- 
-
+  //function to be called if there are not errors in the form data
   function onSubmit(data) {
     mutate(data);
   }
 
+  //error function to be called if there is an error in the form 
+  function onError(errors) {
+    console.log(errors);
+  }
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit, onError)}>
       <FormRow>
         <Label htmlFor="name">Item name</Label>
-        <Input type="text" id="name" {...register('name')} />
+        <Input
+          type="text"
+          disabled={isCreating}
+          id="name"
+          {...register('name', {
+            required: 'This field is required',
+          })}
+        />
+        {errors?.name?.message && <Error>{errors.name.message}</Error>}
       </FormRow>
 
       <FormRow>
         <Label htmlFor="department">Department</Label>
-        <Input type="text" id="department" {...register('department')} />
+        <Input
+          type="text"
+          disabled={isCreating}
+          id="department"
+          {...register('department', {
+            required: 'This field is required',
+            validate: (value) =>
+              value === 'male' ||
+              'The department of the item should at least be in the male department!',
+          })}
+        />
+        {errors?.department?.message && (
+          <Error>{errors.department.message}</Error>
+        )}
       </FormRow>
 
       <FormRow>
         <Label htmlFor="regularPrice">Regular price</Label>
-        <Input type="number" id="regularPrice" {...register('regularPrice')} />
+        <Input
+          type="number"
+          disabled={isCreating}
+          id="regularPrice"
+          {...register('regularPrice', {
+            required: 'This field is required',
+            min: {
+              value: 1,
+              message: 'Price should be at least 1',
+            },
+          })}
+        />
+        {errors?.regularPrice?.message && (
+          <Error>{errors.regularPrice.message}</Error>
+        )}
       </FormRow>
 
       <FormRow>
         <Label htmlFor="discount">Discount</Label>
         <Input
           type="number"
+          disabled={isCreating}
           id="discount"
           defaultValue={0}
-          {...register('discount')}
+          {...register('discount', {
+            required: 'This field is required',
+            validate: (value) =>
+              value <= getValues().regularPrice ||
+              'Discount should be less than the regualar price!',
+          })}
         />
+        {errors?.discount?.message && <Error>{errors.discount.message}</Error>}
       </FormRow>
 
       <FormRow>
-        <Label htmlFor="description">Description for website</Label>
+        <Label htmlFor="description">Description of Item</Label>
         <Textarea
           type="number"
+          disabled={isCreating}
           id="description"
           defaultValue=""
-          {...register('description')}
+          {...register('description', {
+            required: 'This field is required',
+          })}
         />
+        {errors?.description?.message && (
+          <Error>{errors.description.message}</Error>
+        )}
       </FormRow>
 
       <FormRow>
@@ -115,7 +174,7 @@ function CreateInventoryForm() {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating }>Add item</Button>
+        <Button disabled={isCreating}>Add item</Button>
       </FormRow>
     </Form>
   );
