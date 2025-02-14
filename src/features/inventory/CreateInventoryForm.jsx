@@ -51,7 +51,7 @@ function CreateInventoryForm() {
 
   //get errors from the formState
   const { errors } = formState;
-  console.log(errors)
+  console.log(errors);
 
   //call react query client
   const queryClient = useQueryClient();
@@ -71,10 +71,10 @@ function CreateInventoryForm() {
 
   //function to be called if there are not errors in the form data
   function onSubmit(data) {
-    mutate(data);
+    mutate({ ...data, image: data.image[0] });
   }
 
-  //error function to be called if there is an error in the form 
+  //error function to be called if there is an error in the form
   function onError(errors) {
     console.log(errors);
   }
@@ -166,7 +166,13 @@ function CreateInventoryForm() {
 
       <FormRow>
         <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
+        <FileInput
+          id="image"
+          accept="image/*"
+          {...register('image', {
+            required: 'This field is required',
+          })}
+        />
       </FormRow>
 
       <FormRow>
