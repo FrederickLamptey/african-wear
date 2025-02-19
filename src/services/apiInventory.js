@@ -41,6 +41,8 @@ export async function createEditInventory(newInventory, id) {
   }
 
   //Upload image to database
+  if (hasImagePath) return data;
+  
   const { error: storageError } = await supabase.storage
     .from('inventory-images')
     .upload(imageName, newInventory.image);

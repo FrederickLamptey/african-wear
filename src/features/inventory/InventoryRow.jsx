@@ -3,6 +3,8 @@ import { formatCurrency } from '../../utils/helpers';
 import { useState } from 'react';
 import CreateInventoryForm from './CreateInventoryForm';
 import { useDeleteInventory } from './useDeleteInventory';
+import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
+import { useCreateInventory } from './useCreateInventory';
 
 const TableRow = styled.div`
   display: grid;
@@ -48,6 +50,7 @@ const Discount = styled.div`
 function InventoryRow({ inventory }) {
   const [showForm, setShowForm] = useState(false);
   const { isDeleting, deleteInventory } = useDeleteInventory();
+  const { createInventory, isCreating } = useCreateInventory();
 
   const {
     id: inventoryId,
@@ -56,8 +59,20 @@ function InventoryRow({ inventory }) {
     regularPrice,
     discount,
     image,
+    description
   } = inventory;
 
+
+  function handleDuplicate() {
+    createInventory({
+      name: `Copy of ${name}`,
+      department,
+      regularPrice,
+      discount,
+      image,
+      description,
+    });
+  }
 
   
   return (
@@ -69,11 +84,12 @@ function InventoryRow({ inventory }) {
         <Price>{formatCurrency(regularPrice)}</Price>
         {discount ?<Discount>{formatCurrency(discount)}</Discount> : <span>&mdash;</span>}
         <div>
+          <button disabled={isCreating} onClick={handleDuplicate}><HiSquare2Stack /></button>
           <button onClick={() => setShowForm((showForm) => !showForm)}>
-            Edit
+            <HiPencil />
           </button>
           <button onClick={() => deleteInventory(inventoryId)} disabled={isDeleting}>
-            Delete
+            <HiTrash />
           </button>
         </div>
       </TableRow>
