@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 import { formatCurrency } from '../../utils/helpers';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteInventory } from '../../services/apiInventory';
-import toast from 'react-hot-toast';
 import { useState } from 'react';
 import CreateInventoryForm from './CreateInventoryForm';
+import { useDeleteInventory } from './useDeleteInventory';
 
 const TableRow = styled.div`
   display: grid;
@@ -49,6 +47,7 @@ const Discount = styled.div`
 
 function InventoryRow({ inventory }) {
   const [showForm, setShowForm] = useState(false);
+  const { isDeleting, deleteInventory } = useDeleteInventory();
 
   const {
     id: inventoryId,
@@ -58,18 +57,9 @@ function InventoryRow({ inventory }) {
     discount,
     image,
   } = inventory;
-  const queryClient = useQueryClient();
 
-  const { isLoading: isDeleting, mutate } = useMutation({
-    mutationFn: deleteInventory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['inventory'],
-      });
-      toast.success('Item successfully deleted!');
-    },
-    onError: (err) => toast.error(err.message),
-  });
+
+  
   return (
     <>
       <TableRow role="row">
@@ -82,7 +72,7 @@ function InventoryRow({ inventory }) {
           <button onClick={() => setShowForm((showForm) => !showForm)}>
             Edit
           </button>
-          <button onClick={() => mutate(inventoryId)} disabled={isDeleting}>
+          <button onClick={() => deleteInventory(inventoryId)} disabled={isDeleting}>
             Delete
           </button>
         </div>
