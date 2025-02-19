@@ -1,14 +1,12 @@
 import styled from 'styled-components';
-
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createEditInventory } from '../../services/apiInventory';
-import toast from 'react-hot-toast';
+import {useCreateInventory} from './useCreateInventory';
+import {useEditInventory} from './useEditInventory';
 
 const FormRow = styled.div`
   display: grid;
@@ -58,35 +56,10 @@ function CreateInventoryForm({ inventoryToEdit = {} }) {
   const { errors } = formState;
   console.log(errors);
 
-  //call react query client
-  const queryClient = useQueryClient();
+  const { isCreating, createInventory } = useCreateInventory();
 
-  //create inventory in the database
-  const { mutate: createInventory, isLoading: isCreating } = useMutation({
-    mutationFn: createEditInventory,
-    onSuccess: () => {
-      toast.success('New inventory successfully created');
-      queryClient.invalidateQueries({
-        queryKey: ['inventory'],
-      });
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
+  const { editInventory, isEditing } = useEditInventory();
 
-  //Edit inventory in the database
-  const { mutate: editInventory, isLoading: isEditing } = useMutation({
-    mutationFn: ({ newInventoryData, id }) =>
-      createEditInventory(newInventoryData, id),
-    onSuccess: () => {
-      toast.success('Inventory successfully edited');
-      queryClient.invalidateQueries({
-        queryKey: ['inventory'],
-      });
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
 
   const isWorking = isCreating || isEditing;
 
@@ -95,8 +68,23 @@ function CreateInventoryForm({ inventoryToEdit = {} }) {
     const image = typeof data.image === 'string' ? data.image : data.image[0];
 
     if (isEditSession)
-      editInventory({ newInventoryData: { ...data, image }, id: editId });
-    else createInventory({ ...data, image: data.image[0] });
+      editInventory(
+        { newInventoryData: { ...data, image }, id: editId },
+        {
+          onSuccess: (data) => {
+            reset();
+          },
+        }
+      );
+    else
+      createInventory(
+        { ...data, image: data.image[0] },
+        {
+          onSuccess: (data) => {
+            reset();
+          },
+        }
+      );
   }
 
   //error function to be called if there is an error in the form
