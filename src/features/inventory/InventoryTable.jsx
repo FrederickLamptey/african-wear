@@ -1,8 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { getInventory } from '../../services/apiInventory';
 import Spinner from '../../ui/Spinner';
 import InventoryRow from './InventoryRow';
+import { useFetchInventory } from './useFetchInventory';
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -29,14 +28,7 @@ const TableHeader = styled.header`
 `;
 
 function InventoryTable() {
-  const {
-    isLoading,
-    data: inventory,
-    error,
-  } = useQuery({
-    queryKey: ['inventory'],
-    queryFn: getInventory,
-  });
+ const { isLoading, error, inventory } = useFetchInventory()
 
   if (isLoading) return <Spinner />;
 
