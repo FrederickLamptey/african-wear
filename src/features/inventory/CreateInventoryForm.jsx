@@ -7,7 +7,7 @@ import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createInventory } from '../../services/apiInventory';
+import { createEditInventory } from '../../services/apiInventory';
 import toast from 'react-hot-toast';
 
 const FormRow = styled.div`
@@ -46,8 +46,13 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function CreateInventoryForm() {
-  const { register, handleSubmit, reset, getValues, formState } = useForm();
+function CreateInventoryForm({ inventoryToEdit = {} }) {
+  const { id: editId, ...editValues } = inventoryToEdit;
+  const isEditSession = Boolean(editId);
+
+  const { register, handleSubmit, reset, getValues, formState } = useForm({
+    defaultValues: isEditSession ? editValues : {},
+  });
 
   //get errors from the formState
   const { errors } = formState;
@@ -57,8 +62,8 @@ function CreateInventoryForm() {
   const queryClient = useQueryClient();
 
   //create inventory in the database
-  const { mutate, isLoading: isCreating } = useMutation({
-    mutationFn: createInventory,
+  const { mutate: createInventory, isLoading: isCreating } = useMutation({
+    mutationFn: createEditInventory,
     onSuccess: () => {
       toast.success('New inventory successfully created');
       queryClient.invalidateQueries({
@@ -69,9 +74,29 @@ function CreateInventoryForm() {
     onError: (err) => toast.error(err.message),
   });
 
-  //function to be called if there are not errors in the form data
+  //Edit inventory in the database
+  const { mutate: editInventory, isLoading: isEditing } = useMutation({
+    mutationFn: ({ newInventoryData, id }) =>
+      createEditInventory(newInventoryData, id),
+    onSuccess: () => {
+      toast.success('Inventory successfully edited');
+      queryClient.invalidateQueries({
+        queryKey: ['inventory'],
+      });
+      reset();
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const isWorking = isCreating || isEditing;
+
+  //function to be called if there are no errors in the form data
   function onSubmit(data) {
-    mutate({ ...data, image: data.image[0] });
+    const image = typeof data.image === 'string' ? data.image : data.image[0];
+
+    if (isEditSession)
+      editInventory({ newInventoryData: { ...data, image }, id: editId });
+    else createInventory({ ...data, image: data.image[0] });
   }
 
   //error function to be called if there is an error in the form
@@ -85,7 +110,7 @@ function CreateInventoryForm() {
         <Label htmlFor="name">Item name</Label>
         <Input
           type="text"
-          disabled={isCreating}
+          disabled={isWorking}
           id="name"
           {...register('name', {
             required: 'This field is required',
@@ -98,13 +123,10 @@ function CreateInventoryForm() {
         <Label htmlFor="department">Department</Label>
         <Input
           type="text"
-          disabled={isCreating}
+          disabled={isWorking}
           id="department"
           {...register('department', {
             required: 'This field is required',
-            validate: (value) =>
-              value === 'male' ||
-              'The department of the item should at least be in the male department!',
           })}
         />
         {errors?.department?.message && (
@@ -116,7 +138,7 @@ function CreateInventoryForm() {
         <Label htmlFor="regularPrice">Regular price</Label>
         <Input
           type="number"
-          disabled={isCreating}
+          disabled={isWorking}
           id="regularPrice"
           {...register('regularPrice', {
             required: 'This field is required',
@@ -135,7 +157,7 @@ function CreateInventoryForm() {
         <Label htmlFor="discount">Discount</Label>
         <Input
           type="number"
-          disabled={isCreating}
+          disabled={isWorking}
           id="discount"
           defaultValue={0}
           {...register('discount', {
@@ -152,7 +174,7 @@ function CreateInventoryForm() {
         <Label htmlFor="description">Description of Item</Label>
         <Textarea
           type="number"
-          disabled={isCreating}
+          disabled={isWorking}
           id="description"
           defaultValue=""
           {...register('description', {
@@ -170,7 +192,7 @@ function CreateInventoryForm() {
           id="image"
           accept="image/*"
           {...register('image', {
-            required: 'This field is required',
+            required: isEditSession ? false : 'This field is required',
           })}
         />
       </FormRow>
@@ -180,7 +202,9 @@ function CreateInventoryForm() {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating}>Add item</Button>
+        <Button disabled={isWorking}>
+          {isEditSession ? 'Edit item' : 'Add new item'}
+        </Button>
       </FormRow>
     </Form>
   );

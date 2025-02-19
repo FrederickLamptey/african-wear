@@ -3,6 +3,8 @@ import { formatCurrency } from '../../utils/helpers';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteInventory } from '../../services/apiInventory';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
+import CreateInventoryForm from './CreateInventoryForm';
 
 const TableRow = styled.div`
   display: grid;
@@ -46,6 +48,8 @@ const Discount = styled.div`
 `;
 
 function InventoryRow({ inventory }) {
+  const [showForm, setShowForm] = useState(false);
+
   const {
     id: inventoryId,
     name,
@@ -67,16 +71,24 @@ function InventoryRow({ inventory }) {
     onError: (err) => toast.error(err.message),
   });
   return (
-    <TableRow role="row">
-      <Img src={image} />
-      <Item>{name}</Item>
-      <div>{department}</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
-      <button onClick={() => mutate(inventoryId)} disabled={isDeleting}>
-        Delete
-      </button>
-    </TableRow>
+    <>
+      <TableRow role="row">
+        <Img src={image} />
+        <Item>{name}</Item>
+        <div>{department}</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        <Discount>{formatCurrency(discount)}</Discount>
+        <div>
+          <button onClick={() => setShowForm((showForm) => !showForm)}>
+            Edit
+          </button>
+          <button onClick={() => mutate(inventoryId)} disabled={isDeleting}>
+            Delete
+          </button>
+        </div>
+      </TableRow>
+      {showForm && <CreateInventoryForm inventoryToEdit={ inventory } />}
+    </>
   );
 }
 
