@@ -4,7 +4,14 @@ import Filter from '../../ui/Filter';
 function InventoryTableOperations() {
   return (
     <TableOperations>
-      <Filter />
+      <Filter
+        filteredField="discount"
+        options={[
+          { value: 'all', label: 'All' },
+          { value: 'no-discount', label: 'No discount' },
+          { value: 'with-discount', label: 'With discount' },
+        ]}
+      />
     </TableOperations>
   );
 }
