@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
 import InventoryRow from './InventoryRow';
 import { useFetchInventory } from './useFetchInventory';
+import { useSearchParams } from 'react-router-dom';
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -28,9 +29,20 @@ const TableHeader = styled.header`
 `;
 
 function InventoryTable() {
- const { isLoading, error, inventory } = useFetchInventory()
+  const { isLoading, inventory } = useFetchInventory();
+  const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />;
+
+  const filterValue = searchParams.get('discount') || 'all';
+
+  let filteredInventory;
+
+  if (filterValue === 'all') filteredInventory = inventory;
+  if (filterValue === 'no-discount')
+    filteredInventory = inventory.filter((item) => item.discount === 0);
+  if (filterValue === 'with-discount')
+    filteredInventory = inventory.filter((item) => item.discount > 0);
 
   return (
     <Table role="table">
@@ -42,7 +54,7 @@ function InventoryTable() {
         <div>Discount</div>
         <div></div>
       </TableHeader>
-      {inventory.map((item) => (
+      {filteredInventory.map((item) => (
         <InventoryRow inventory={item} key={item.id} />
       ))}
     </Table>
