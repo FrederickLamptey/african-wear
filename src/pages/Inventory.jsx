@@ -5,6 +5,8 @@ import InventoryTable from '../features/inventory/InventoryTable';
 import { useState } from 'react';
 import Button from '../ui/Button';
 import CreateInventoryForm from '../features/inventory/CreateInventoryForm';
+import InventoryTableOperations from '../features/inventory/InventoryTableOperations';
+
 
 function Inventory() {
   const [showForm, setShowForm] = useState(false);
@@ -13,7 +15,7 @@ function Inventory() {
     <>
       <Row type="horizontal">
         <Heading as="h1">All Items</Heading>
-        <p>Filter / Sort</p>
+        <InventoryTableOperations />
       </Row>
 
       <Row>
