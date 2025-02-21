@@ -34,6 +34,7 @@ function InventoryTable() {
 
   if (isLoading) return <Spinner />;
 
+  //filter
   const filterValue = searchParams.get('discount') || 'all';
 
   let filteredInventory;
@@ -44,21 +45,37 @@ function InventoryTable() {
   if (filterValue === 'with-discount')
     filteredInventory = inventory.filter((item) => item.discount > 0);
 
-  return (
-    <Table role="table">
-      <TableHeader role="row">
-        <div></div>
-        <div>Item</div>
-        <div>Department</div>
-        <div>Price</div>
-        <div>Discount</div>
-        <div></div>
-      </TableHeader>
-      {filteredInventory.map((item) => (
-        <InventoryRow inventory={item} key={item.id} />
-      ))}
-    </Table>
-  );
+  // sort 
+  const sortBy = searchParams.get("sortBy") || "startDate-asc";
+  const [field, direction] = sortBy.split("-");
+  const modifier = direction === "asc" ? 1 : -1;
+  // const sortedInventory = filteredInventory.sort((a, b) => (a[field] - b[field]) * modifier);
+  // console.log(typeof(sortedInventory))
+   let sortedInventory = filteredInventory.sort(
+     (a, b) => (a[field] - b[field]) * modifier
+   );
+  
+  if (sortBy === 'department-mal') sortedInventory = filteredInventory.filter(item => item.department === "male")
+   if (sortBy === 'department-fem')
+     sortedInventory = filteredInventory.filter(
+       (item) => item.department === 'female'
+     );
+  
+    return (
+      <Table role="table">
+        <TableHeader role="row">
+          <div></div>
+          <div>Item</div>
+          <div>Department</div>
+          <div>Price</div>
+          <div>Discount</div>
+          <div></div>
+        </TableHeader>
+        {sortedInventory.map((item) => (
+          <InventoryRow inventory={item} key={item.id} />
+        ))}
+      </Table>
+    );
 }
 
 export default InventoryTable;

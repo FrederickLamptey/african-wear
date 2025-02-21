@@ -7,7 +7,6 @@ import Button from '../ui/Button';
 import CreateInventoryForm from '../features/inventory/CreateInventoryForm';
 import InventoryTableOperations from '../features/inventory/InventoryTableOperations';
 
-
 function Inventory() {
   const [showForm, setShowForm] = useState(false);
 
@@ -21,8 +20,8 @@ function Inventory() {
       <Row>
         <InventoryTable />
 
-        <Button onClick={() => setShowForm(showForm => !showForm)}>
-          Add new cabin
+        <Button onClick={() => setShowForm((showForm) => !showForm)}>
+          Add new item
         </Button>
         {showForm && <CreateInventoryForm />}
       </Row>
