@@ -3,6 +3,7 @@ import Spinner from '../../ui/Spinner';
 import InventoryRow from './InventoryRow';
 import { useFetchInventory } from './useFetchInventory';
 import { useSearchParams } from 'react-router-dom';
+import Empty from '../../ui/Empty';
 
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -33,7 +34,7 @@ function InventoryTable() {
   const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />;
-
+  if (!inventory.length) return <Empty resourceName="item(s)" />;
   //filter
   const filterValue = searchParams.get('discount') || 'all';
 
@@ -45,37 +46,40 @@ function InventoryTable() {
   if (filterValue === 'with-discount')
     filteredInventory = inventory.filter((item) => item.discount > 0);
 
-  // sort 
-  const sortBy = searchParams.get("sortBy") || "startDate-asc";
-  const [field, direction] = sortBy.split("-");
-  const modifier = direction === "asc" ? 1 : -1;
+  // sort
+  const sortBy = searchParams.get('sortBy') || 'startDate-asc';
+  const [field, direction] = sortBy.split('-');
+  const modifier = direction === 'asc' ? 1 : -1;
   // const sortedInventory = filteredInventory.sort((a, b) => (a[field] - b[field]) * modifier);
   // console.log(typeof(sortedInventory))
-   let sortedInventory = filteredInventory.sort(
-     (a, b) => (a[field] - b[field]) * modifier
-   );
-  
-  if (sortBy === 'department-mal') sortedInventory = filteredInventory.filter(item => item.department === "male")
-   if (sortBy === 'department-fem')
-     sortedInventory = filteredInventory.filter(
-       (item) => item.department === 'female'
-     );
-  
-    return (
-      <Table role="table">
-        <TableHeader role="row">
-          <div></div>
-          <div>Item</div>
-          <div>Department</div>
-          <div>Price</div>
-          <div>Discount</div>
-          <div></div>
-        </TableHeader>
-        {sortedInventory.map((item) => (
-          <InventoryRow inventory={item} key={item.id} />
-        ))}
-      </Table>
+  let sortedInventory = filteredInventory.sort(
+    (a, b) => (a[field] - b[field]) * modifier
+  );
+
+  if (sortBy === 'department-mal')
+    sortedInventory = filteredInventory.filter(
+      (item) => item.department === 'male'
     );
+  if (sortBy === 'department-fem')
+    sortedInventory = filteredInventory.filter(
+      (item) => item.department === 'female'
+    );
+
+  return (
+    <Table role="table">
+      <TableHeader role="row">
+        <div></div>
+        <div>Item</div>
+        <div>Department</div>
+        <div>Price</div>
+        <div>Discount</div>
+        <div></div>
+      </TableHeader>
+      {sortedInventory.map((item) => (
+        <InventoryRow inventory={item} key={item.id} />
+      ))}
+    </Table>
+  );
 }
 
 export default InventoryTable;
