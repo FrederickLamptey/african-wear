@@ -16,7 +16,7 @@ function PurchaseTable() {
       <Table columns="0.6fr 2fr 2.4fr 1.4fr 1fr 3.2rem">
         <Table.Header>
           <div>Item</div>
-          <div>Guest</div>
+          <div>Customer</div>
           <div>Status</div>
           <div>Amount</div>
           <div>date</div>
