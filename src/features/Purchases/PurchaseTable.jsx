@@ -3,6 +3,7 @@ import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import Empty from '../../ui/Empty';
 import { useFetchPurchases } from './useFetchPurchases';
+import Pagination from '../../ui/Pagination';
 
 
 function PurchaseTable() {
@@ -29,6 +30,9 @@ function PurchaseTable() {
             <PurchaseRow key={purchase.id} purchase={purchase} />
           )}
         />
+        <Table.Footer>
+          <Pagination count={5}/>
+        </Table.Footer>
       </Table>
     </Menus>
   );
