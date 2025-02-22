@@ -1,16 +1,22 @@
 // import { getToday } from "../utils/helpers";
 import supabase from './supabase';
 
-export async function getPurchases({filter, sortBy}) {
+export async function getPurchases({ filter, sortBy }) {
   let query = supabase
     .from('purchases')
     .select(
       'id, created_at, status, itemPrice, inventory(name), guests(fullName, email)'
-  );
+    );
 
   //FILTER
-  if (filter !== null) query = query[filter.method || "eq"](filter.field, filter.value)
-  
+  if (filter) query = query[filter.method || 'eq'](filter.field, filter.value);
+
+  //SORT
+  if (sortBy)
+    query = query.order(sortBy.field, {
+      ascending: sortBy.direction === 'asc',
+    });
+
   const { data, error } = await query;
 
   if (error) {
