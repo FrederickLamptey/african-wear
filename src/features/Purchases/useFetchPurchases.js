@@ -9,26 +9,37 @@ export function useFetchPurchases() {
   // get state value of filter from url
   const filterValue = searchParams.get('status');
 
-//conditional filter value setting 
+  //conditional filter value setting
   const filter =
     !filterValue || filterValue === 'all'
       ? null
       : { field: 'status', value: filterValue, method: 'eq' };
-  
+
   //SORT
   //get state value of sorting from url
-  const sortByRaw = searchParams.get("sortBy") || "date-desc";
-  const [field, direction] = sortByRaw.split("-");
+  const sortByRaw = searchParams.get('sortBy') || 'date-desc';
+  const [field, direction] = sortByRaw.split('-');
   const sortBy = { field, direction };
+
+  //PAGINATION
+  //get current page
+   const page = !searchParams.get('page')
+     ? 1
+    : Number(searchParams.get('page'));
   
   const {
     isLoading,
-    data: purchases = [],
+    data,
     error,
   } = useQuery({
-    queryKey: ['purchases', filter, sortBy],
-    queryFn: () => getPurchases({ filter, sortBy }),
+    queryKey: ['purchases', filter, sortBy, page],
+    queryFn: () => getPurchases({ filter, sortBy, page}),
   });
 
-  return { isLoading, error, purchases };
+    return {
+      isLoading,
+      error,
+      purchases: data?.data || [], // Extract purchases (default to empty array)
+      totalCount: data?.count || 0, // Extract total count (default to 0)
+    };
 }

@@ -1,11 +1,13 @@
 // import { getToday } from "../utils/helpers";
+import { PAGE_SIZE } from '../utils/constants';
 import supabase from './supabase';
 
-export async function getPurchases({ filter, sortBy }) {
+export async function getPurchases({ filter, sortBy, page }) {
   let query = supabase
     .from('purchases')
     .select(
-      'id, created_at, status, itemPrice, inventory(name), guests(fullName, email)'
+      'id, created_at, status, itemPrice, inventory(name), guests(fullName, email)',
+      { count: 'exact' }
     );
 
   //FILTER
@@ -17,14 +19,23 @@ export async function getPurchases({ filter, sortBy }) {
       ascending: sortBy.direction === 'asc',
     });
 
-  const { data, error } = await query;
+  // PAGINATION
+  let from, to;
+  if (page) {
+    from = (page - 1) * PAGE_SIZE;
+    to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, count, error } = await query;
 
   if (error) {
     console.error(error);
     throw new Error('Purchases could not be loaded');
   }
 
-  return data;
+  // return data;
+  return { data, count };
 }
 
 export async function getPurchase(id) {

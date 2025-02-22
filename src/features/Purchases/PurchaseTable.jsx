@@ -7,8 +7,8 @@ import Pagination from '../../ui/Pagination';
 
 
 function PurchaseTable() {
-  const { isLoading, error, purchases } = useFetchPurchases();
-  console.log(purchases)
+  const { isLoading, purchases, totalCount } = useFetchPurchases();
+
 
   if (!purchases.length) return <Empty resourceName="purchases"/>
 
@@ -31,7 +31,7 @@ function PurchaseTable() {
           )}
         />
         <Table.Footer>
-          <Pagination count={5}/>
+          <Pagination count={totalCount} />
         </Table.Footer>
       </Table>
     </Menus>
