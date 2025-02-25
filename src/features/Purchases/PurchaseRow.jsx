@@ -6,6 +6,8 @@ import Table from '../../ui/Table';
 
 import { formatCurrency } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
+import { HiTrash } from 'react-icons/hi2';
+import useDeletePurchase from './useDeletePurchase';
 
 const Item = styled.div`
   font-size: 1.6rem;
@@ -44,6 +46,8 @@ function PurchaseRow({
     inventory: { name: inventoryName } = [],
   },
 }) {
+  const { isDeleting, deletePurchase } = useDeletePurchase();
+  
   const statusToTagName = {
     unreceived: 'red',
     'received': 'green',
@@ -64,6 +68,11 @@ function PurchaseRow({
       <Stacked>
         <span>{format(new Date(created_at), 'MMM dd yyyy')}</span>
       </Stacked>
+      <div>
+        <button onClick={()=> deletePurchase(purchaseId)} disabled={isDeleting}>
+          <HiTrash />
+        </button>
+      </div>
     </Table.Row>
   );
 }

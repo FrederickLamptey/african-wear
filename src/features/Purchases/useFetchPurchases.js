@@ -1,8 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPurchases } from '../../services/apiPurchases';
 import { useSearchParams } from 'react-router-dom';
+import { PAGE_SIZE } from '../../utils/constants';
 
 export function useFetchPurchases() {
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
   //FILTER
@@ -23,23 +25,29 @@ export function useFetchPurchases() {
 
   //PAGINATION
   //get current page
-   const page = !searchParams.get('page')
-     ? 1
-    : Number(searchParams.get('page'));
-  
-  const {
-    isLoading,
-    data,
-    error,
-  } = useQuery({
+  const page = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));
+
+  //QUERY
+  const { isLoading, data, error } = useQuery({
     queryKey: ['purchases', filter, sortBy, page],
-    queryFn: () => getPurchases({ filter, sortBy, page}),
+    queryFn: () => getPurchases({ filter, sortBy, page }),
   });
 
-    return {
-      isLoading,
-      error,
-      purchases: data?.data || [], // Extract purchases (default to empty array)
-      totalCount: data?.count || 0, // Extract total count (default to 0)
-    };
+  //PRE-FETCHING
+  queryClient.prefetchQuery({
+    queryKey: ['purchases', filter, sortBy, page + 1],
+    queryFn: () => getPurchases({ filter, sortBy, page: page + 1 }),
+  });
+
+    queryClient.prefetchQuery({
+      queryKey: ['purchases', filter, sortBy, page - 1],
+      queryFn: () => getPurchases({ filter, sortBy, page: page - 1 }),
+    });
+
+  return {
+    isLoading,
+    error,
+    purchases: data?.data || [], // Extract purchases (default to empty array)
+    totalCount: data?.count || 0, // Extract total count (default to 0)
+  };
 }
