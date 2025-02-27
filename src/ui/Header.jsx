@@ -1,11 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import ButtonIcon from "./ButtonIcon";
+import SpinnerMini from "./SpinnerMini"
 import { HiOutlineHome } from 'react-icons/hi2';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi2';
 import { HiOutlineListBullet } from 'react-icons/hi2';
 import { HiOutlineUserPlus } from 'react-icons/hi2';
 import { HiOutlineUser } from 'react-icons/hi2';
 import { HiOutlineLockClosed } from 'react-icons/hi2';
+import { useLogout } from "../features/authentication/useLogout";
 
 const Nav = styled.nav`
   display: flex;
@@ -66,6 +69,8 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 function Header() {
+  const { logout, isLoading } = useLogout();
+
   return (
     <header>
       <Nav>
@@ -110,10 +115,9 @@ function Header() {
               </StyledNavLink>
             </li>
             <li>
-              <StyledNavLink to="/login">
-                <HiOutlineLockClosed />
-                <span>Logout</span>
-              </StyledNavLink>
+              <ButtonIcon disabled={isLoading} onClick={logout}>
+               {!isLoading ? <HiOutlineLockClosed /> : <SpinnerMini />}
+              </ButtonIcon>
             </li>
           </HeaderUl>
         </HeaderDiv>
