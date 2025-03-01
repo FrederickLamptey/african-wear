@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import ButtonIcon from "./ButtonIcon";
 import SpinnerMini from "./SpinnerMini"
+import UserAvatar from "../features/authentication/UserAvatar"
 import { HiOutlineHome } from 'react-icons/hi2';
 import { HiOutlineCurrencyDollar } from 'react-icons/hi2';
 import { HiOutlineListBullet } from 'react-icons/hi2';
@@ -108,6 +109,9 @@ function Header() {
 
         <HeaderDiv>
           <HeaderUl>
+            <li>
+              <UserAvatar />
+            </li>
             <li>
               <StyledNavLink to="/account">
                 <HiOutlineUser />
