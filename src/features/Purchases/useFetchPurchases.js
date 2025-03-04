@@ -1,7 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPurchases } from '../../services/apiPurchases';
 import { useSearchParams } from 'react-router-dom';
-import { PAGE_SIZE } from '../../utils/constants';
 
 export function useFetchPurchases() {
   const queryClient = useQueryClient();
