@@ -1,3 +1,4 @@
+import { getToday } from '../utils/helpers';
 import supabase, { supabaseUrl } from './supabase';
 
 export async function getInventory() {
@@ -11,8 +12,24 @@ export async function getInventory() {
   return data;
 }
 
+// Returns all Inventory that were created after the given date. Useful to get purchases created in the last 30 days, for example.
+export async function getInventoryAfterDate(date) {
+  const { data, error } = await supabase
+    .from('inventory')
+    .select('created_at, department')
+    .gte('created_at', date)
+    .lte('created_at', getToday({ end: true }));
+
+  if (error) {
+    console.error(error);
+    throw new Error('Inventory could not get loaded');
+  }
+
+  return data;
+}
+
 export async function createEditInventory(newInventory, id) {
-  console.log(newInventory, id)
+  console.log(newInventory, id);
   //checking if the updated image has the file path required in order to uploaded
   const hasImagePath = newInventory.image?.startsWith?.(supabaseUrl);
 
@@ -32,7 +49,8 @@ export async function createEditInventory(newInventory, id) {
   if (!id) query = query.insert([{ ...newInventory, image: imagePath }]);
 
   //B) EDIT
-  if (id) query = query.update({ ...newInventory, image: imagePath }).eq('id', id);
+  if (id)
+    query = query.update({ ...newInventory, image: imagePath }).eq('id', id);
   const { data, error } = await query.select().single();
 
   if (error) {
@@ -42,7 +60,7 @@ export async function createEditInventory(newInventory, id) {
 
   //Upload image to database
   if (hasImagePath) return data;
-  
+
   const { error: storageError } = await supabase.storage
     .from('inventory-images')
     .upload(imageName, newInventory.image);

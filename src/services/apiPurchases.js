@@ -53,7 +53,7 @@ export async function getPurchase(id) {
   return data;
 }
 
-// Returns all Purchases that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
+// Returns all Purchases that are were created after the given date. Useful to get purchases created in the last 30 days, for example.
 export async function getPurchasesAfterDate(date) {
   const { data, error } = await supabase
     .from('purchases')
