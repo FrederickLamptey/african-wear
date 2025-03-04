@@ -8,12 +8,6 @@ const Menu = styled.div`
   justify-content: flex-end;
 `;
 
-const StyledMenu = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-`;
-
 const StyledToggle = styled.button`
   background: none;
   border: none;
@@ -31,17 +25,6 @@ const StyledToggle = styled.button`
     height: 2.4rem;
     color: var(--color-grey-700);
   }
-`;
-
-const StyledList = styled.ul`
-  position: fixed;
-
-  background-color: var(--color-grey-0);
-  box-shadow: var(--shadow-md);
-  border-radius: var(--border-radius-md);
-
-  right: ${(props) => props.position.x}px;
-  top: ${(props) => props.position.y}px;
 `;
 
 const StyledButton = styled.button`
