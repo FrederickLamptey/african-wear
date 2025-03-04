@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { useRecentPurchases } from './useRecentPurchases';
 import Spinner from '../../ui/Spinner';
 import Stats from './Stats';
-import { HiOutlineCurrencyDollar } from 'react-icons/hi2';
 import { useRecentInventory } from './useRecentInventory';
 
 const StyledDashboardLayout = styled.div`
