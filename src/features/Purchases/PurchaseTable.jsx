@@ -7,7 +7,7 @@ import Pagination from '../../ui/Pagination';
 
 
 function PurchaseTable() {
-  const { isLoading, purchases, totalCount } = useFetchPurchases();
+  const { purchases, totalCount } = useFetchPurchases();
 
 
   if (!purchases.length) return <Empty resourceName="purchases"/>
