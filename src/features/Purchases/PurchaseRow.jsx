@@ -1,11 +1,8 @@
 import styled from 'styled-components';
-import { format, isToday } from 'date-fns';
-
+import { format } from 'date-fns';
 import Tag from '../../ui/Tag';
 import Table from '../../ui/Table';
-
 import { formatCurrency } from '../../utils/helpers';
-import { formatDistanceFromNow } from '../../utils/helpers';
 import { HiTrash } from 'react-icons/hi2';
 import useDeletePurchase from './useDeletePurchase';
 
@@ -47,10 +44,10 @@ function PurchaseRow({
   },
 }) {
   const { isDeleting, deletePurchase } = useDeletePurchase();
-  
+
   const statusToTagName = {
     unreceived: 'red',
-    'received': 'green',
+    received: 'green',
   };
 
   return (
@@ -69,7 +66,10 @@ function PurchaseRow({
         <span>{format(new Date(created_at), 'MMM dd yyyy')}</span>
       </Stacked>
       <div>
-        <button onClick={()=> deletePurchase(purchaseId)} disabled={isDeleting}>
+        <button
+          onClick={() => deletePurchase(purchaseId)}
+          disabled={isDeleting}
+        >
           <HiTrash />
         </button>
       </div>
